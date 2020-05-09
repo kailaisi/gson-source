@@ -45,6 +45,7 @@ import java.util.Map;
 /**
  * Type adapter that reflects over the fields and methods of a class.
  */
+//类型适配器，反映类的字段和方法。
 public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
   private final ConstructorConstructor constructorConstructor;
   private final FieldNamingStrategy fieldNamingPolicy;

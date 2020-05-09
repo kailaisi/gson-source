@@ -121,20 +121,21 @@ public final class Gson {
      * The proxy is wired up once the initial adapter has been created.
      */
     private final ThreadLocal<Map<TypeToken<?>, FutureTypeAdapter<?>>> calls = new ThreadLocal<Map<TypeToken<?>, FutureTypeAdapter<?>>>();
-    //缓存的 TypeToken和TpyeAdapter对应关系，线程安全的
+    //缓存的 TypeToken和TpyeAdapter对应关系，采用ConcurrentHashMap，保障了多个线程操作时，不会发生线程安全问题
     private final Map<TypeToken<?>, TypeAdapter<?>> typeTokenCache = new ConcurrentHashMap<TypeToken<?>, TypeAdapter<?>>();
 
     private final ConstructorConstructor constructorConstructor;
+    //json对应的
     private final JsonAdapterAnnotationTypeAdapterFactory jsonAdapterFactory;
-    //解析器列表，里面包含了对各种常用的对象类型的解析，
+    //TypeAdapterFactory列表，里面包含了对各种常用的对象类型的解析工厂，
     // 如果需要自定义解析方法的话，需要通过注册，将其添加到这个列表中
     final List<TypeAdapterFactory> factories;
     //用于配置一些你不希望被转换成JSON格式的对象的成员变量的
     final Excluder excluder;
-    //字段命名策略，默认的是字段名称
+    //字段命名策略，默认的是属性名称
     final FieldNamingStrategy fieldNamingStrategy;
     final Map<Type, InstanceCreator<?>> instanceCreators;
-    //是否序列化空值
+    //是否序列化空值。默认为false。如果为true，那么如果字段没有设置对应的值，则会序列化为 a:null 这种
     final boolean serializeNulls;
     //
     final boolean complexMapKeySerialization;

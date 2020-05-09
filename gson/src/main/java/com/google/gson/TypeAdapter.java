@@ -116,6 +116,7 @@ import java.io.Writer;
 // TypeAdapter<Date>} can convert {@code Date} instances to JSON and JSON to
 // instances of {@code Date}, but cannot convert any other types.
 //
+//将Java对象与JSON进行转换。
 public abstract class TypeAdapter<T> {
 
   /**
@@ -124,6 +125,7 @@ public abstract class TypeAdapter<T> {
    *
    * @param value the Java object to write. May be null.
    */
+  //将T对象写入到JsonWriter中。这这面JsonWriter代表Json数据，T代表Type对应的对象
   public abstract void write(JsonWriter out, T value) throws IOException;
 
   /**
@@ -137,6 +139,7 @@ public abstract class TypeAdapter<T> {
    * @param value the Java object to convert. May be null.
    * @since 2.2
    */
+  //
   public final void toJson(Writer out, T value) throws IOException {
     JsonWriter writer = new JsonWriter(out);
     write(writer, value);
@@ -244,6 +247,7 @@ public abstract class TypeAdapter<T> {
    *
    * @return the converted Java object. May be null.
    */
+  //从JsonReader中读取数据，然后生成Type所对应的的T对象
   public abstract T read(JsonReader in) throws IOException;
 
   /**
