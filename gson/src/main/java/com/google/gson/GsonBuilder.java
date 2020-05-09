@@ -75,6 +75,7 @@ import static com.google.gson.Gson.DEFAULT_SPECIALIZE_FLOAT_VALUES;
  * @author Joel Leitch
  * @author Jesse Wilson
  */
+//Gson的配置方法，正常的Gson创建的话，设置的信息都是默认的，如果我们需要自己配置相关属性，就可以
 public final class GsonBuilder {
   private Excluder excluder = Excluder.DEFAULT;
   private LongSerializationPolicy longSerializationPolicy = LongSerializationPolicy.DEFAULT;

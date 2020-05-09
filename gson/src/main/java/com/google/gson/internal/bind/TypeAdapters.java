@@ -60,6 +60,7 @@ import com.google.gson.stream.JsonWriter;
 /**
  * Type adapters for basic types.
  */
+//基本类型的解析器，主要封装了各种常用的数据类型的解析，包括Class,Bit,String,Json等
 public final class TypeAdapters {
   private TypeAdapters() {
     throw new UnsupportedOperationException();

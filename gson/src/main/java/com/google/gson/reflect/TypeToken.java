@@ -44,6 +44,7 @@ import java.util.Map;
  * @author Sven Mawson
  * @author Jesse Wilson
  */
+//TypeToken可以看做是对Java范型的扩展，大家都知道Java范型是有类型擦除效果的，无法获得其真实类型。而这个类就是为了处理这种情况的，我们从文件中的注释也可以了解到。
 public class TypeToken<T> {
   final Class<? super T> rawType;
   final Type type;

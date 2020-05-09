@@ -50,8 +50,9 @@ import java.util.List;
 public final class Excluder implements TypeAdapterFactory, Cloneable {
   private static final double IGNORE_VERSIONS = -1.0d;
   public static final Excluder DEFAULT = new Excluder();
-
+  //忽略的版本号
   private double version = IGNORE_VERSIONS;
+  //忽略的修饰符，默认对于static和transient的不进行解析
   private int modifiers = Modifier.TRANSIENT | Modifier.STATIC;
   private boolean serializeInnerClasses = true;
   private boolean requireExpose;
@@ -65,13 +66,13 @@ public final class Excluder implements TypeAdapterFactory, Cloneable {
       throw new AssertionError(e);
     }
   }
-
+  //配置忽略的版本号
   public Excluder withVersion(double ignoreVersionsAfter) {
     Excluder result = clone();
     result.version = ignoreVersionsAfter;
     return result;
   }
-
+  //配置忽略的修饰符
   public Excluder withModifiers(int... modifiers) {
     Excluder result = clone();
     result.modifiers = 0;

@@ -160,6 +160,7 @@ import com.google.gson.reflect.TypeToken;
  *
  * @since 2.1
  */
+//TypeAdapter工厂接口
 public interface TypeAdapterFactory {
 
   /**

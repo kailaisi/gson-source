@@ -32,6 +32,7 @@ import java.io.Writer;
 /**
  * Reads and writes GSON parse trees over streams.
  */
+//通过streams流来进行GSON树的读写
 public final class Streams {
   private Streams() {
     throw new UnsupportedOperationException();
