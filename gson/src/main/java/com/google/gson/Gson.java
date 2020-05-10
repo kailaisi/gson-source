@@ -282,8 +282,7 @@ public final class Gson {
         factories.add(jsonAdapterFactory);
         factories.add(TypeAdapters.ENUM_FACTORY);
         //用来进行反射的处理
-        factories.add(new ReflectiveTypeAdapterFactory(
-                constructorConstructor, fieldNamingStrategy, excluder, jsonAdapterFactory));
+        factories.add(new ReflectiveTypeAdapterFactory(constructorConstructor, fieldNamingStrategy, excluder, jsonAdapterFactory));
 
         this.factories = Collections.unmodifiableList(factories);
     }
