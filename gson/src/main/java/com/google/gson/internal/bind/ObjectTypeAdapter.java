@@ -39,6 +39,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
         @SuppressWarnings("unchecked")
         @Override
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            //如果type对应的RawType是Object，则创建一个ObjectTypeAdapter
             if (type.getRawType() == Object.class) {
                 return (TypeAdapter<T>) new ObjectTypeAdapter(gson);
             }
@@ -52,12 +53,13 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
         this.gson = gson;
     }
 
+    //in代表JSON解析器，能够对读入的JSON字符串进行解析处理
     @Override
     public Object read(JsonReader in) throws IOException {
         //获取元素类型
         JsonToken token = in.peek();
         switch (token) {
-            case BEGIN_ARRAY://数组。数组类型的话，需要使用List来保存
+            case BEGIN_ARRAY://如果是数组类型的话，需要使用List来保存
                 List<Object> list = new ArrayList<Object>();
                 in.beginArray();//开始标识
                 while (in.hasNext()) {//如果有下一个元素，则递归读取
@@ -69,7 +71,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
             case BEGIN_OBJECT://对象类型，对象类型，则使用map来保存，key是对象的属性名称，value保存属性值
                 Map<String, Object> map = new LinkedTreeMap<String, Object>();
                 in.beginObject();
-                while (in.hasNext()) {
+                while (in.hasNext()) {//遍历循环
                     map.put(in.nextName(), read(in));
                 }
                 in.endObject();

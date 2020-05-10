@@ -229,6 +229,7 @@ public final class Gson {
         factories.add(ObjectTypeAdapter.FACTORY);
 
         // the excluder must precede all adapters that handle user-defined types
+        //excluder必须在处理用户自定义的类型之前进行添加
         factories.add(excluder);
 
         // users' type adapters
@@ -640,6 +641,7 @@ public final class Gson {
         if (src == null) {
             return toJson(JsonNull.INSTANCE);
         }
+        //调用重载方法
         return toJson(src, src.getClass());
     }
 
@@ -659,7 +661,9 @@ public final class Gson {
      * @return Json representation of {@code src}
      */
     public String toJson(Object src, Type typeOfSrc) {
+        //创建了一个StringWriter对象
         StringWriter writer = new StringWriter();
+        //重载方法
         toJson(src, typeOfSrc, writer);
         return writer.toString();
     }
