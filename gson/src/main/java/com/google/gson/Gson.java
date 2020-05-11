@@ -123,7 +123,7 @@ public final class Gson {
     private final ThreadLocal<Map<TypeToken<?>, FutureTypeAdapter<?>>> calls = new ThreadLocal<Map<TypeToken<?>, FutureTypeAdapter<?>>>();
     //缓存的 TypeToken和TpyeAdapter对应关系，采用ConcurrentHashMap，保障了多个线程操作时，不会发生线程安全问题
     private final Map<TypeToken<?>, TypeAdapter<?>> typeTokenCache = new ConcurrentHashMap<TypeToken<?>, TypeAdapter<?>>();
-
+    //实例构造器
     private final ConstructorConstructor constructorConstructor;
     //json对应的
     private final JsonAdapterAnnotationTypeAdapterFactory jsonAdapterFactory;

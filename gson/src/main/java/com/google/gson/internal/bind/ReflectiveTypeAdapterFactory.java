@@ -48,8 +48,11 @@ import java.util.Map;
  */
 //类型适配器，反映类的字段和方法。
 public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
+    //实例构造器
     private final ConstructorConstructor constructorConstructor;
+    //属性的命名策略
     private final FieldNamingStrategy fieldNamingPolicy;
+    //排除的属性值
     private final Excluder excluder;
     private final JsonAdapterAnnotationTypeAdapterFactory jsonAdapterFactory;
     private final ReflectionAccessor accessor = ReflectionAccessor.getInstance();
@@ -74,6 +77,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
     /**
      * first element holds the default name
      */
+    //获取属性的名称，会使用对应的名称策略或者使用的@SerializedName注解
     private List<String> getFieldNames(Field f) {
         SerializedName annotation = f.getAnnotation(SerializedName.class);
         if (annotation == null) {
@@ -98,19 +102,20 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
     @Override
     public <T> TypeAdapter<T> create(Gson gson, final TypeToken<T> type) {
         Class<? super T> raw = type.getRawType();
-
+        //如果不是Object的子类类，则不匹配，只直接返回
         if (!Object.class.isAssignableFrom(raw)) {
             return null; // it's a primitive!
         }
-
+        //获取Type所对应构造器
         ObjectConstructor<T> constructor = constructorConstructor.get(type);
-        //创建一个TypeAdapter
+        //创建一个TypeAdapter 重点方法***getBoundFields
         return new Adapter<T>(constructor, getBoundFields(gson, type, raw));
     }
 
     private ReflectiveTypeAdapterFactory.BoundField createBoundField(
             final Gson context, final Field field, final String name,
             final TypeToken<?> fieldType, boolean serialize, boolean deserialize) {
+        //是否是原始数据类型  boolean,int,char,float,double等
         final boolean isPrimitive = Primitives.isPrimitive(fieldType.getRawType());
         // special casing primitives here saves ~5% on Android...
         JsonAdapter annotation = field.getAnnotation(JsonAdapter.class);
@@ -120,6 +125,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
             mapped = jsonAdapterFactory.getTypeAdapter(constructorConstructor, context, fieldType, annotation);
         }
         final boolean jsonAdapterPresent = mapped != null;
+        //尝试获取类型所对应的TypeAdapter
         if (mapped == null) mapped = context.getAdapter(fieldType);
 
         final TypeAdapter<?> typeAdapter = mapped;
@@ -157,7 +163,6 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
         if (raw.isInterface()) {
             return result;
         }
-
         Type declaredType = type.getType();
         while (raw != Object.class) {
             //获取所有属性
@@ -179,16 +184,20 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
                 for (int i = 0, size = fieldNames.size(); i < size; ++i) {
                     String name = fieldNames.get(i);
                     if (i != 0) serialize = false; // only serialize the default name
+                    //根据filed、type、以及是否支持序列化和反序列化来创建一个BoundField对象
                     BoundField boundField = createBoundField(context, field, name, TypeToken.get(fieldType), serialize, deserialize);
+                    //将属性名称作为key，boundField作为value保存到result中
                     BoundField replaced = result.put(name, boundField);
+                    //如果之前出现过name这个属性的话，这里机会导致previous不为空，从而报错
                     if (previous == null) previous = replaced;
                 }
                 if (previous != null) {
-                    throw new IllegalArgumentException(declaredType
-                            + " declares multiple JSON fields named " + previous.name);
+                    throw new IllegalArgumentException(declaredType + " declares multiple JSON fields named " + previous.name);
                 }
             }
+            //
             type = TypeToken.get($Gson$Types.resolve(type.getType(), raw, raw.getGenericSuperclass()));
+            //获取父类类型，最终肯定会获取到Object，从而终止整个循环
             raw = type.getRawType();
         }
         return result;
@@ -228,9 +237,7 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
                 in.nextNull();
                 return null;
             }
-
             T instance = constructor.construct();
-
             try {
                 in.beginObject();//从"{"开始
                 while (in.hasNext()) {
