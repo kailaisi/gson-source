@@ -454,25 +454,32 @@ public final class Gson {
     @SuppressWarnings("unchecked")
 
     public <T> TypeAdapter<T> getAdapter(TypeToken<T> type) {
+        //先尝试从缓存获取，缓存使用的是ConcurrentHashMap，能够保障线程的安全性。
         TypeAdapter<?> cached = typeTokenCache.get(type == null ? NULL_KEY_SURROGATE : type);
         if (cached != null) {
+            //如果获取到则直接返回
             return (TypeAdapter<T>) cached;
         }
+        //all属于一个ThreadLocal变量，保存了Map对象，而map对象则缓存了FutureTypeAdapter类型。
         //获取当前线程对应的解析器。这里为嘛用一个线程安全的calls？？好奇
         Map<TypeToken<?>, FutureTypeAdapter<?>> threadCalls = calls.get();
         boolean requiresThreadLocalCleanup = false;
-        if (threadCalls == null) {
+        if (threadCalls == null) {//如果为空，则创建，保证后面不会出现空指针问题
             threadCalls = new HashMap<TypeToken<?>, FutureTypeAdapter<?>>();
             calls.set(threadCalls);
+            //最后需要根据这个字段进行线程的清空处理
             requiresThreadLocalCleanup = true;
         }
         // the key and value type parameters always agree
+        //如果从ThreadLocal内部的Map缓存中获取到对应的TypeAdapter则直接返回
         FutureTypeAdapter<T> ongoingCall = (FutureTypeAdapter<T>) threadCalls.get(type);
         if (ongoingCall != null) {
             return ongoingCall;
         }
         try {
+            //创建一个FutureTypeAdapter对象
             FutureTypeAdapter<T> call = new FutureTypeAdapter<T>();
+            //将其缓存
             threadCalls.put(type, call);
 
             for (TypeAdapterFactory factory : factories) {
@@ -722,9 +729,9 @@ public final class Gson {
      */
     @SuppressWarnings("unchecked")
     public void toJson(Object src, Type typeOfSrc, JsonWriter writer) throws JsonIOException {
-        //获取对应的TypeAdapter
+        //****重点方法****   获取对应的TypeAdapter
         TypeAdapter<?> adapter = getAdapter(TypeToken.get(typeOfSrc));
-        //设置配置
+        //设置配置,并且保存原有的配置，在最后会将配置进行还原
         boolean oldLenient = writer.isLenient();
         writer.setLenient(true);
         boolean oldHtmlSafe = writer.isHtmlSafe();
