@@ -481,7 +481,6 @@ public final class Gson {
             FutureTypeAdapter<T> call = new FutureTypeAdapter<T>();
             //将其缓存
             threadCalls.put(type, call);
-
             for (TypeAdapterFactory factory : factories) {
                 //通过注册的factory来创建type类型，如果创建成功，则表明factory能够进行type类型的创建，
                 //如果返回未null，则表明factory不能进行type类型的创建
@@ -495,8 +494,9 @@ public final class Gson {
             }
             throw new IllegalArgumentException("GSON (" + GsonBuildConfig.VERSION + ") cannot handle " + type);
         } finally {
+            //因为已经将type缓存到typeTokenCache中了。所以ThreadLocal里面的缓存用不到了。移除
             threadCalls.remove(type);
-
+            //如果创建了ThreadLocal对象，则进行清除
             if (requiresThreadLocalCleanup) {
                 calls.remove();
             }
@@ -714,6 +714,7 @@ public final class Gson {
      */
     public void toJson(Object src, Type typeOfSrc, Appendable writer) throws JsonIOException {
         try {
+            //创建一个JsonWriter对象
             JsonWriter jsonWriter = newJsonWriter(Streams.writerForAppendable(writer));
             toJson(src, typeOfSrc, jsonWriter);
         } catch (IOException e) {
@@ -882,11 +883,13 @@ public final class Gson {
      */
     @SuppressWarnings("unchecked")
     public <T> T fromJson(String json, Type typeOfT) throws JsonSyntaxException {
+        //如果字符串是空，则直接返回null
         if (json == null) {
             return null;
         }
-        //创建一个StringReader
+        //创建一个StringReader，入参是json字符串，
         StringReader reader = new StringReader(json);
+        //重载方法
         T target = (T) fromJson(reader, typeOfT);
         return target;
     }
@@ -937,9 +940,11 @@ public final class Gson {
      */
     @SuppressWarnings("unchecked")
     public <T> T fromJson(Reader json, Type typeOfT) throws JsonIOException, JsonSyntaxException {
-        //创建一个JsonReader
+        //将Read进行包装，创建一个JsonReader
         JsonReader jsonReader = newJsonReader(json);
+        //重载方法
         T object = (T) fromJson(jsonReader, typeOfT);
+        //判断是否读取完了
         assertFullConsumption(object, jsonReader);
         return object;
     }
@@ -1054,6 +1059,7 @@ public final class Gson {
     }
 
     static class FutureTypeAdapter<T> extends TypeAdapter<T> {
+        //代理模式
         private TypeAdapter<T> delegate;
 
         public void setDelegate(TypeAdapter<T> typeAdapter) {
