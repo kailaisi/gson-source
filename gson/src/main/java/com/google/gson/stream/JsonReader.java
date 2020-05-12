@@ -240,6 +240,20 @@ public class JsonReader implements Closeable {
     /**
      * True to accept non-spec compliant JSON
      */
+    //容错属性
+    /*
+        )]}'\n 前缀
+        多个顶级值
+        顶级值不是 object/array类型
+        数字类型为无穷数，或者不是个数字
+        一行的结尾存在//或者 #注释
+        C语言风格的注释/…/
+        name用了单引号或者没用引号
+        string用了单引号或者没用引号
+        数组元素的分隔符用了;而不是,
+        name和value不是用：分隔，而是用=或=>
+        name/value对之间不是逗号分隔，而是;分隔
+    */
     private boolean lenient = false;
 
     /**
@@ -474,15 +488,19 @@ public class JsonReader implements Closeable {
         }
     }
 
+    //通过读取一个字符，获取下一个元素的数据类型
     int doPeek() throws IOException {
+        //获取当前栈顶的状态
         int peekStack = stack[stackSize - 1];
         if (peekStack == JsonScope.EMPTY_ARRAY) {
             stack[stackSize - 1] = JsonScope.NONEMPTY_ARRAY;
         } else if (peekStack == JsonScope.NONEMPTY_ARRAY) {
             // Look for a comma before the next element.
+            //在下一个元素前查找符号。
             int c = nextNonWhitespace(true);
+            //如果当前状态是非空的数组，那么写一个元素肯定是']'或者逗号
             switch (c) {
-                case ']':
+                case ']'://如果是"]"，证明当前数据结束了
                     return peeked = PEEKED_END_ARRAY;
                 case ';':
                     checkLenient(); // fall-through

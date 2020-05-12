@@ -269,8 +269,10 @@ public final class ReflectiveTypeAdapterFactory implements TypeAdapterFactory {
             out.beginObject();
             try {
                 for (BoundField boundField : boundFields.values()) {
-                    if (boundField.writeField(value)) {
+                    if (boundField.writeField(value)) {//获取
                         out.name(boundField.name);//先输出属性名称
+                        //这里会获取value所对应的TypeAdapter类型，然后调用其write方法进行相关属性的记录。
+                        //因为我们的的value可能是任何类型
                         boundField.write(out, value);//再输出属性值
                     }
                 }
